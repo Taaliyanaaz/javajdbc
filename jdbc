@@ -1,0 +1,75 @@
+package jdbcconnection;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
+public class JdbcSqlConnection {
+	
+	public static void main(String args[])
+	{
+		final Logger logger= LogManager.getLogger(JdbcSqlConnection.class);
+		
+		Connection con = null;
+		try {
+			String connectionUrl = "jdbc:sqlserver://172.16.51.64;" + "databaseName=231047025;encrypt=true;trustServerCertificate=true";
+			Properties properties = new Properties();			
+			InputStream input = new FileInputStream("F:/Taaliya/Eclipse-CAJD1/jdbcconnection/bin/jdbcconnection/config.properties");
+			properties.load(input);
+			 // username to connect db
+			String userName = properties.getProperty("username");	
+
+		    // password to connect db
+			String dbPASSWORD = properties.getProperty("password");
+		
+			
+		// Obtain a connection
+			con = DriverManager.getConnection(connectionUrl,userName,dbPASSWORD);
+			logger.info("Connection established successfully");
+		// Obtain a statement
+			
+			Statement st = con.createStatement();
+			ResultSet result=st.executeQuery("select * from Employee1");
+			while(result.next()) {
+			System.out.println(result.getInt(1)+"  "+result.getString(2)+"  "+result.getInt(3));
+			}
+		
+		}
+		catch (Exception e) {
+			logger.error("Facing some error");
+			System.out.println("Catching exception");
+		}
+		
+		finally {
+			 System.out.println("Entering finally block");
+				try {
+					if(!con.isClosed())
+					{
+					    con.close();
+					    //logger.debug("Connection closed");
+					    System.out.println("Connection closed in Finally");
+					}
+				} catch (Exception e)
+				{
+					System.out.println("exception in finally block");
+					//logger.error("Error while closing connection - "+sq.getMessage());
+				}
+				
+		}
+
+}
+}
+
+//Properties file should be .properties format and in key-value pair user="Taaliyanaaz"
+//password="naaz@523"
+
+//log4j.xml and right click and add libraries
